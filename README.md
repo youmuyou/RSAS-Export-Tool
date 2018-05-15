@@ -28,5 +28,5 @@ python3 主程序 原始报告目录路径，支持多个报告
 
 ### 单个压缩包导出效果图：
 ![](http://p68yfqejc.bkt.clouddn.com/rsas.png)
-### 多个压缩包导出效果图：
+### 多个压缩包导出效果图，2507个漏洞，花时10分钟绝望了：
 ![](http://p68yfqejc.bkt.clouddn.com/rsrs.png)
