@@ -1,6 +1,6 @@
 # RSAS-Export-Tool
 Python 绿盟远程安全评估系统(RSAS)漏洞跟踪表导出工具
-原始扫描报告代码在这：http://p68yfqejc.bkt.clouddn.com/192.168.1.2.zip
+
 
 ### 2018年5月14日
 - [ ] 代码注释、思路在这看：https://webing.io/article/computer-python-rsas-tool.html
