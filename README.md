@@ -4,8 +4,11 @@
 - [x] 不弄了
 
 ### 功能
-支持导出数据：IP地址、漏洞名称、风险分类、风险等级、整改建议、漏洞CVE编号、漏洞对应端口、漏洞对应协议、漏洞对应服务
+支持导出数据：
+IP地址、漏洞名称、风险分类、风险等级、整改建议、漏洞CVE编号、漏洞对应端口、漏洞对应协议、漏洞对应服务
+
 实现思路、去掉的功能、代码注释可以到这看：https://webing.io/article/computer-python-rsas-tool.html
+
 无多线程，有大佬加上的恳请分享我一份，谢谢！邮箱：纸条 webing.io@qq.com
 
 
@@ -27,6 +30,7 @@ python3   vulnerable.py   /mnt/c/Users/Administrator/Desktop/扫描报告
 python3   主程序              原始报告存放目录
 ```
 运行环境Python3以上，原始报告目录如：把原始报告放在 C:\扫描报告 目录下就这么执行：python3 vulnerable.py C:\扫描报告
+
 扫描报告目录下可以放任意多个扫描报告
 如：
 ![](http://p68yfqejc.bkt.clouddn.com/sapmoap.png)
