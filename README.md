@@ -35,5 +35,5 @@ python3   主程序              原始报告存放目录
 如：
 ![](http://p68yfqejc.bkt.clouddn.com/sapmoap.png)
 
-导出如图,上边为多个，下边为多个：
+导出如图,上边为单个，下边为多个：
 ![](http://p4nyd2zat.bkt.clouddn.com/xiaoguotu.png)
