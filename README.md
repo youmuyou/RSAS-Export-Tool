@@ -63,9 +63,13 @@ vulnerable.py C:\Users\Administrator\Desktop\原始扫描报告
 Windows下不能执行，可删掉：encoding='utf-8' 恢复正常，分享的代码已经删除。
 
 #### 漏洞报告目录文件
-上边提到的漏洞报告目录，目录下都有哪些文件？
+
+
 从RSAS这么导出的原始报告才能用这个工具：
 报表输出-勾选主机报表
+
+上边提到的漏洞报告目录，目录下都有哪些文件？
+
 就是你从漏扫直接导出来的报告，通常为zip压缩包，反正不支持其他的，如图：
 ![](http://p4nyd2zat.bkt.clouddn.com/rsas_zip.png)
 压缩包里边都有啥？如图：
