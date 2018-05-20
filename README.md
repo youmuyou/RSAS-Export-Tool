@@ -4,9 +4,7 @@
 工具涉及：目录获取文件、ZIP文件读取、正则表达式、Excel表格处理、文件读写
 
 GitHub：https://github.com/webingio/RSAS-Export-Tool
-
 这是测试的原始报告：http://p68yfqejc.bkt.clouddn.com/192.168.1.2.zip
-
 实现思路、去掉的功能、代码注释可以到这看（我的博客笔记）：https://webing.io/article/computer-python-rsas-tool.html
 
 #### 测试环境
@@ -64,8 +62,13 @@ Windows下不能执行，可删掉：encoding='utf-8' 恢复正常，分享的�
 
 #### 漏洞报告目录文件
 上边提到的漏洞报告目录，目录下都有哪些文件？
+从RSAS这么导出的原始报告才能用这个工具：
+报表输出-勾选主机报表
 就是你从漏扫直接导出来的报告，通常为zip压缩包，反正不支持其他的，如图：
 ![](http://p4nyd2zat.bkt.clouddn.com/rsas_zip.png)
+压缩包里边都有啥？如图：
+![](http://p4nyd2zat.bkt.clouddn.com/rsas_zip_content.png)
+
 
 ### 导出效果
 本次测试共导出17个原始扫描报告，如图。
@@ -77,6 +80,7 @@ Windows下不能执行，可删掉：encoding='utf-8' 恢复正常，分享的�
 
 #### 导出数据效果图：
 ![](http://p4nyd2zat.bkt.clouddn.com/rsas_gif.gif)
+
 
 ---
 ---
