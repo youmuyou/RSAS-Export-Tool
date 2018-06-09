@@ -64,7 +64,7 @@ def load_date():
                         for list_details in vul_details:
                             with open('./Coredata/temp/%s.mdb'%title_content, 'a') as content:
                                 content.write('<python>vul_details<python>\n')
-                                content.write(html.unescape(list_details).replace(u'\xa0', u' '))
+                                content.write(html.unescape(list_details).replace('\xa0', ' '))
 #                                 content.write(html.unescape(list_details))
                                 content.write('\n<python>vul_details</python>\n')
 
