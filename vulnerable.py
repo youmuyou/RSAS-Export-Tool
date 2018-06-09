@@ -3,6 +3,7 @@ import re
 import sys
 import html
 import time
+import queue
 import zipfile
 import datetime
 import openpyxl
@@ -12,51 +13,67 @@ import Coredata.load
 class Vul_re(object):
     def __init__(self):
         super(Vul_re, self).__init__()
+        #正则，用于获取2.1 漏洞概况所有内容，以及IP地址
         self.vul_list_re = '<python>host<python>.*?<td valign="top".*?<th width="120">IP地址</th>.*?<td>(.*?)</td>.*?</td>.*?<python>host</python>.*?<python>vul_list<python>(.*?)<python>vul_list</python>'
+        #正则，用于获取2.2 漏洞详情所有内容
         self.vul_detail_re = '<python>vul_detail<python>(.*?)<python>vul_detail</python>'
+        #正则，用于获取2.2 每个漏洞的漏洞详情
         self.vul_details_re = '<python>vul_details<python>(.*?)<python>vul_details</python>'
 
-        self.danger_re = '<span class="level_danger_(.*?)".*?(table_\d_\d+).*?>(.*?)</span>'
+        #正则，用于获取漏洞名称
+        self.danger_re = '<span class="level_danger_(.*?)".*?table_\d_(\d+).*?>(.*?)</span>'
+        #正则，获取标题，用于命名sheet工作表
         self.title_re = '<python>title<python>(.*?)<python>title</python>'
+        #正则，用于获取漏洞的端口、协议、服务、漏洞内容
         self.other_re = '<td class="vul_port">(.*?)</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?<td>.*?<ul>(.*?)</ul>'
 
 class Vul_content(object):
     def __init__(self,vul_re):
         super(Vul_content, self).__init__()
+        #获取2.1 漏洞概况所有内容
         self.vul_list_content = re.findall(vul_re.vul_list_re,htmlcont,re.S|re.M)
+        #获取2.2 漏洞详情所有内容
         self.vul_detail_content = re.findall(vul_re.vul_detail_re,htmlcont,re.S|re.M)
 
-
 class Solve_re(object):
-    def __init__(self, danger):
+    def __init__(self):
         super(Solve_re, self).__init__()
-        self.solve_re = '<tr class="solution.*?%s.*?<th width="100">解决办法</th>.*?<td>(.*?)</td>' % danger
-        self.describe_re = '<tr class="solution.*?%s.*?<th width="100">详细描述</th>.*?<td>(.*?)</td>' % danger
-        self.cve_re = '<tr class="solution.*?%s.*?<th width="100">CVE编号</th>.*?<td><a target=.*?>(.*?)</a>.*?</td>' % danger
+        #正则，用于获取漏洞的解决办法，danger[0]是2.1 漏洞概况获取的table标签
+        self.solve_re = '<th width="100">解决办法</th>.*?<td>(.*?)</td>'
+        #正则，用于获取漏洞的详细描述
+        self.describe_re = '<tr class="solution.*?table_\d_(\d+).*?<th width="100">详细描述</th>.*?<td>(.*?)</td>'
+        #正则，用于获取漏洞的CVE编号
+        self.cve_re = '<th width="100">CVE编号</th>.*?<td><a target=.*?>(.*?)</a>.*?</td>'
+
 
 class Other(object):
     def __init__(self, vul_re, all_vuln_list):
         super(Other, self).__init__()
+        #获取漏洞的端口、协议、服务、漏洞内容
         self.all_other = re.findall(vul_re.other_re,all_vuln_list,re.S|re.M)
 
 class Danger(object):
     def __init__(self, vul_re, other):
         super(Danger, self).__init__()
+        #获取漏洞名称、与之相关的漏洞table标签
         self.danger_coneent = re.findall(vul_re.danger_re,other,re.S|re.M)
 
 class Solve(object):
-    def __init__(self, solve, all_vul_detail):
+    def __init__(self, solve, all_vul_details):
         super(Solve, self).__init__()
-        self.solve_plumb = re.findall(solve.solve_re,all_vul_detail,re.S|re.M)
-        self.describe_plumb = re.findall(solve.describe_re,all_vul_detail,re.S|re.M)
-        self.cve_plumb = re.findall(solve.cve_re,all_vul_detail,re.S|re.M)
+        #获取漏洞的解决办法、详细描述、CVE编号
+        self.solve_plumb = re.findall(solve.solve_re,all_vul_details,re.S|re.M)
+        self.describe_plumb = re.findall(solve.describe_re,all_vul_details,re.S|re.M)
+        self.cve_plumb = re.findall(solve.cve_re,all_vul_details,re.S|re.M)
 
 def main():
     folder_name = str(sys.argv[1])
     print('\n数据提取完成，正在生成漏洞跟踪表...')
+    #创建表格
     wb = openpyxl.Workbook()
     ws = wb.active
 
+    #定义Vul_re的正则
     vul_re = Vul_re()
 
     with open('./Coredata/database.mdb') as content:
@@ -66,6 +83,8 @@ def main():
             global htmlcont
             htmlcont = content.read()
             content.close()
+            # 获取标题，用于sheet工作表名称
+            #正则：<python>title<python>(.*?)<python>title</python>
             sheet_name =  re.findall(vul_re.title_re,htmlcont,re.S|re.M)
             print('正在导出 %s'%sheet_name[0])
             ws = wb.create_sheet(sheet_name[0],0)
@@ -82,34 +101,62 @@ def main():
             ws['K1'] = '漏洞对应协议'
             ws['L1'] = '漏洞对应服务'
 
+            #正则，获取漏洞概况、漏洞详情
             vul_content = Vul_content(vul_re)
-            x = 0
 
-            for all_vul_detail in vul_content.vul_detail_content:
-                vul_details_content = re.findall(vul_re.vul_details_re,all_vul_detail,re.S|re.M)
+            vul_all_list = []
+            vul_all_detail = []
 
+            #获取IP地址、2.1 漏洞概况所有内容,存放列表中['ip','漏洞概况']，迭代
             for all_vul_list in vul_content.vul_list_content:
+                #获取漏洞的端口、协议、服务、漏洞内容，并迭代
                 for other in Other(vul_re,all_vul_list[1]).all_other:
+                    #获取与之相关的漏洞内容、漏洞table标签，并迭代出来
                     for danger in Danger(vul_re,other[3]).danger_coneent:
-                        x += 1
-                        for all_vul_details in vul_details_content:
-                            vul_detail = Solve(Solve_re(danger[1]),all_vul_details)
-                            for solve,describe in zip(vul_detail.solve_plumb,vul_detail.describe_plumb):
-                                cve = vul_detail.cve_plumb
-                                if cve:
-                                    pass
-                                else:
-                                    cve = ['漏洞暂无CVE编号。']
-                        ws.append([x,'',all_vul_list[0],danger[2],'漏洞',danger[0].replace('low','低').replace('middle','中').replace('high','高'),html.unescape(re.sub('<br/>','',solve)).replace(' ','').strip('\n'),html.unescape(re.sub('<br/>','',describe)).replace(' ','').strip('\n'),cve[0],other[0],other[1],other[2]])
+                        vul_all_list.append([danger[1],all_vul_list[0],danger[2],danger[0].replace('low','低').replace('middle','中').replace('high','高'),other[0],other[1],other[2]])
+
+            #迭代2.2 漏洞详情所有内容,用到上边的table标签，用于区分
+            for all_vul_detail in vul_content.vul_detail_content:
+            #获取2.2 漏洞详情所有内容
+                vul_details_content = re.findall(vul_re.vul_details_re,all_vul_detail,re.S|re.M)
+                for all_vul_details in vul_details_content:
+                #获取漏洞的解决办法、详细描述、CVE编号
+                    vul_detail = Solve(Solve_re(),all_vul_details)
+                    # #迭代
+                    for solve,describe in zip(vul_detail.solve_plumb,vul_detail.describe_plumb):
+                        cve = vul_detail.cve_plumb
+                        if cve:
+                            pass
+                        else:
+                            cve = ['漏洞暂无CVE编号']
+                        vul_all_detail.append([describe[0],html.unescape(re.sub('<br/>','',solve)).replace(' ','').strip('\n'),html.unescape(re.sub('<br/>','',describe[1])).replace(' ','').strip('\n'),cve[0]])
+
+            for line_vul_list in vul_all_list:
+                vul_list.put(line_vul_list)
+
+            i = 1
+            while not vul_list.empty():
+                wait_list = vul_list.get()
+                for wait_detail in vul_all_detail:
+                    if wait_list[0] == wait_detail[0]:
+                        ws.append([i,'',wait_list[1],wait_list[2],'漏洞',wait_list[3],wait_detail[1],wait_detail[2],wait_detail[3],wait_list[4],wait_list[5],wait_list[6]])
+                        i += 1
+                        break
+
     wb.save(folder_name+'/漏洞跟踪表.xlsx')
     print('\n漏洞跟踪表导出完成，保存在 %s 目录下。'%folder_name)
+
+
 
 
 if __name__ == '__main__':
     starttime = datetime.datetime.now()
     Coredata.load.start_date()
     Coredata.load.load_date()
+    breaktime = datetime.datetime.now()
+    print ('数据提取花时：%s秒...'%(breaktime - starttime).seconds)
+    vul_list = queue.Queue()
     main()
     Coredata.load.end_date()
     endtime = datetime.datetime.now()
-    print ('导出花时：%s秒...'%(endtime - starttime).seconds)
+    print ('导出花时：%s秒...'%(endtime - breaktime).seconds)
