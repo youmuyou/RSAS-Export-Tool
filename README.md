@@ -1,5 +1,7 @@
 ### 添加功能
 新增Windows版本。
+效果图：
+![](http://p68yfqejc.bkt.clouddn.com/rsas_tool.gif)
 
 #### 工具介绍
 绿盟远程安全评估系统漏洞跟踪表导出工具，只支持6.0的RSAS，用于导出各种乱七八糟的数据。
